@@ -1,0 +1,89 @@
+name: backend-cd
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  linting_job:
+    name: Linting job
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install pipenv
+        run: pip install -U pipenv
+      - name: Install packages
+        run: pipenv install
+      - name: Run ESLint
+        run: pipenv run lint
+  test_job:
+    name: Test job
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install pipenv
+        run: pip install -U pipenv
+      - name: Install packages
+        run: pipenv install
+      - name: Run test
+        run: pipenv run test
+  build_job:
+    name: Build job
+    env:
+      AWS_REGION: us-east-1
+      AWS_ACCOUNT_ID: 193180914360
+      EKS_CLUSTER: cluster
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    needs:
+      - linting_job
+      - test_job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Login to AWS ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Extract git tag
+        run: echo "GIT_SHA=$(git rev-parse master)" >> $GITHUB_ENV
+      - name: Verify git tag content
+        run: echo $GIT_SHA
+      - name: Build image
+        run: docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/backend:$GIT_SHA .
+      - name: Deploy image
+        run: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/backend:$GIT_SHA
+      - name: Config kubectl to connect to AWS EKS Cluster
+        run: aws eks update-kubeconfig --name $EKS_CLUSTER
+      - name: Check
+        run: pwd
+      - name: Deploy application
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml

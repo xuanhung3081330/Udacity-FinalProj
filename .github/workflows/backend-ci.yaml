@@ -1,0 +1,73 @@
+name: backend-ci
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - 'master'
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  linting_job:
+    name: Linting job
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install pipenv
+        run: pip install -U pipenv
+      - name: Install packages
+        run: pipenv install
+      - name: Run ESLint
+        run: pipenv run lint
+  test_job:
+    name: Test job
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install pipenv
+        run: pip install -U pipenv
+      - name: Install packages
+        run: pipenv install
+      - name: Run test
+        run: pipenv run test
+  build_job:
+    name: Build job
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    needs:
+      - linting_job
+      - test_job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install pipenv
+        run: pip install -U pipenv
+      - name: Install packages
+        run: pipenv install
+      - name: Build code
+        run: docker build -t backend-ci-build .
