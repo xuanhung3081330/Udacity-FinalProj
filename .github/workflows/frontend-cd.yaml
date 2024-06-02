@@ -21,8 +21,7 @@ jobs:
       - name: Install nvm
         run: |
           sudo apt update
-          curl -o- https://raw.githubusercontent/nvm-sh/nvm/v0.39.3/install.sh | bash
-      - run: nvm use
+          sudo apt install nodejs
       - name: Install packages
         run: npm ci
       - name: Run ESLint
