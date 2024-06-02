@@ -83,7 +83,13 @@ jobs:
         run: aws eks update-kubeconfig --name $EKS_CLUSTER
       - name: Add credentials for kubectl
         run: |
-          aws sts get-caller-identity
+          userArn=$(aws sts get-caller-identity | jq -r .Arn)
+          echo "Downloading tool..."
+          curl -X GET -L https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.2/aws-iam-authenticator_0.6.2_linux_amd64 -o aws-iam-authenticator
+          chmod +x aws-iam-authenticator
+
+          echo "Updating permissions"
+          ./aws-iam-authenticator add user --userarn="${userArn}" --username=github-action-role --groups=system:masters --kubeconfig="$HOME"/.kube/config --prompt=false
       - name: Deploy application
         run: |
           kubectl apply -f k8s/deployment.yaml
