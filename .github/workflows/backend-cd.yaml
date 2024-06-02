@@ -81,8 +81,9 @@ jobs:
         run: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/backend:$GIT_SHA
       - name: Config kubectl to connect to AWS EKS Cluster
         run: aws eks update-kubeconfig --name $EKS_CLUSTER
-      - name: Check for current folder
-        run: ../setup/init.sh
+      - name: Add credentials for kubectl
+        run: |
+          aws sts get-caller-identity
       - name: Deploy application
         run: |
           kubectl apply -f k8s/deployment.yaml
