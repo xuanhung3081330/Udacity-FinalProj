@@ -14,14 +14,16 @@ jobs:
   linting_job:
     name: Linting job
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
+      - name: Install nodejs
+        run: |
+          sudo apt update
+          sudo apt install nodejs
       - name: Install packages
         run: npm ci
       - name: Run ESLint
@@ -29,14 +31,16 @@ jobs:
   test_job:
     name: Test job
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
+      - name: Install nodejs
+        run: |
+          sudo apt update
+          sudo apt install nodejs
       - name: Install packages
         run: npm ci
       - name: Run test
@@ -44,17 +48,19 @@ jobs:
   build_job:
     name: Build job
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     needs:
       - linting_job
       - test_job
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
+      - name: Install nodejs
+        run: |
+          sudo apt update
+          sudo apt install nodejs
       - name: Install packages
         run: npm ci
       - name: Build code
