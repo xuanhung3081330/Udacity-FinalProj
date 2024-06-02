@@ -82,7 +82,9 @@ jobs:
       - name: Config kubectl to connect to AWS EKS Cluster
         run: aws eks update-kubeconfig --name $EKS_CLUSTER
       - name: Check for current folder
-        run: ls -a ./setup
+        run: |
+          cd..
+          ls -a
       - name: Deploy application
         run: |
           kubectl apply -f k8s/deployment.yaml
