@@ -24,5 +24,4 @@ EXPOSE 3000
 # Start the React app when the container starts
 CMD ["npm", "run", "serve"]
 
-# Command to trigger CI part (Pull request)####
-# Change change
+# Change####
