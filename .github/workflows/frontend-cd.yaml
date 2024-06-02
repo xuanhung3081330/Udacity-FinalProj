@@ -21,7 +21,7 @@ jobs:
       - name: Install nvm
         run: |
           sudo apt update
-          nvm install
+          curl -o- https://raw.githubusercontent/nvm-sh/nvm/v0.39.3/install.sh | bash
       - run: nvm use
       - name: Install packages
         run: npm ci
