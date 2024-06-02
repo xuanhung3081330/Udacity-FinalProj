@@ -20,11 +20,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
+      - name: Install nodejs
+        run: |
+          sudo apt update
+          sudo apt install nodejs
       - name: Install packages
         run: npm ci
       - name: Run ESLint
@@ -38,11 +37,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
+      - name: Install nodejs
+        run: |
+          sudo apt update
+          sudo apt install nodejs
       - name: Install packages
         run: npm ci
       - name: Run test
@@ -59,11 +57,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
+      - name: Install nodejs
+        run: |
+          sudo apt update
+          sudo apt install nodejs
       - name: Install packages
         run: npm ci
       - name: Build code
