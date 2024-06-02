@@ -18,8 +18,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup NVM
-        run: nvm install 18
+      - name: Install nvm
+        run: |
+          sudo apt update
+          nvm install
       - run: nvm use
       - name: Install packages
         run: npm ci
